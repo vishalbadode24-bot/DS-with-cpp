@@ -1,0 +1,183 @@
+include <iostream>
+#include <string>
+using namespace std;
+
+const int Totalseats = 30;
+
+struct passenger {
+    int seatno, age;
+    string name;
+    char gender;
+    passenger* next;
+};
+
+passenger* first = NULL;
+
+// Book a ticket
+void booking() {
+    int seatno;
+
+    cout << "Enter seat number (1-30): ";
+    cin >> seatno;
+
+    if (seatno < 1 || seatno > Totalseats) {
+        cout << "Invalid seat number!\n";
+        return;
+    }
+
+    passenger* ptr = first;
+
+    while (ptr != NULL) {
+        if (ptr->seatno == seatno) {
+            cout << "Sorry, seat already booked!\n";
+            return;
+        }
+        ptr = ptr->next;
+    }
+
+    passenger* newnode = new passenger;
+
+    newnode->seatno = seatno;
+
+    cout << "Enter your name: ";
+    cin >> newnode->name;
+
+    cout << "Enter your age: ";
+    cin >> newnode->age;
+
+    cout << "Enter your gender (M/F): ";
+    cin >> newnode->gender;
+
+    newnode->next = first;
+    first = newnode;
+
+    cout << "Seat booked successfully!\n";
+}
+
+// Cancel a ticket
+void cancel() {
+    int seatno;
+
+    cout << "Enter seat number for cancellation: ";
+    cin >> seatno;
+
+    passenger* ptr = first;
+    passenger* prev = NULL;
+
+    while (ptr != NULL && ptr->seatno != seatno) {
+        prev = ptr;
+        ptr = ptr->next;
+    }
+
+    if (ptr == NULL) {
+        cout << "Seat not booked!\n";
+        return;
+    }
+
+    if (prev == NULL) {
+        first = ptr->next;
+    }
+    else {
+        prev->next = ptr->next;
+    }
+
+    delete ptr;
+
+    cout << "Seat cancelled successfully!\n";
+}
+
+// Display passenger details
+void passenger_detail() {
+    passenger* ptr = first;
+
+    if (ptr == NULL) {
+        cout << "No passengers booked!\n";
+        return;
+    }
+
+    while (ptr != NULL) {
+        cout << "\nPassenger seat number: " << ptr->seatno;
+        cout << "\nPassenger name: " << ptr->name;
+        cout << "\nPassenger gender: " << ptr->gender;
+        cout << "\nPassenger age: " << ptr->age;
+        cout << "\n----------------------\n";
+
+        ptr = ptr->next;
+    }
+}
+
+// Display train status
+void viewtrain_status() {
+    cout << "\nTrain Status\n";
+
+    for (int i = 1; i <= Totalseats; i++) {
+        passenger* ptr = first;
+        bool booked = false;
+
+        while (ptr != NULL) {
+            if (ptr->seatno == i) {
+                booked = true;
+                break;
+            }
+            ptr = ptr->next;
+        }
+
+        if (booked)
+            cout << "Seat " << i << ": Booked\n";
+        else
+            cout << "Seat " << i << ": Available\n";
+    }
+}
+
+// Main function
+int main() {
+    int choice;
+
+    do {
+        cout << "\n===== TRAIN RESERVATION SYSTEM =====\n";
+        cout << "1. Book Ticket\n";
+        cout << "2. Cancel Ticket\n";
+        cout << "3. Passenger Details\n";
+        cout << "4. View Train Status\n";
+        cout << "5. Exit\n";
+
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                booking();
+                break;
+
+            case 2:
+                cancel();
+                break;
+
+            case 3:
+                passenger_detail();
+                break;
+
+            case 4:
+                viewtrain_status();
+                break;
+
+            case 5:
+                cout << "Freeing memory...\n";
+
+                while (first != NULL) {
+                    passenger* nextnode = first->next;
+                    delete first;
+                    first = nextnode;
+                }
+
+                cout << "Thank you!\n";
+                break;
+
+            default:
+                cout << "Invalid choice!\n";
+        }
+
+    } while (choice != 5);
+
+    return 0;
+}
